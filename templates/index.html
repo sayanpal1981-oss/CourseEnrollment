@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Enrollment System</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">CE</span>
+      <span class="brand-name">Course Enrollment</span>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-link active" data-section="dashboard">Dashboard</button>
+      <button class="nav-link" data-section="enroll">Enroll a Student</button>
+      <button class="nav-link" data-section="student-courses">Courses by Student</button>
+      <button class="nav-link" data-section="course-students">Students by Course</button>
+      <button class="nav-link" data-section="check-enrollment">Check Enrollment</button>
+      <button class="nav-link" data-section="common-courses">Common Courses</button>
+      <button class="nav-link" data-section="departments">Departments</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p>Logic engine: <strong>SWI-Prolog</strong></p>
+      <p>Server: <strong>Flask</strong></p>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="page-header">
+      <h1>Course Enrollment System</h1>
+      <p class="subtitle">Prolog-Based Student &amp; Course Management</p>
+    </header>
+
+    <div id="toast" class="toast" hidden></div>
+
+    <section class="view active" id="view-dashboard">
+      <p class="query-line">Dashboard Overview</p>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-number" id="stat-students">–</span>
+          <span class="stat-label">Total Students</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="stat-courses">–</span>
+          <span class="stat-label">Total Courses</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="stat-enrollments">–</span>
+          <span class="stat-label">Total Enrollments</span>
+        </div>
+      </div>
+
+      <div class="panel-grid">
+        <div class="panel">
+          <h2>Students</h2>
+          <table class="data-table" id="table-students">
+            <thead><tr><th>ID</th><th>Name</th><th>Department</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h2>Courses</h2>
+          <table class="data-table" id="table-courses">
+            <thead><tr><th>ID</th><th>Name</th><th>Dept</th><th>Credits</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-enroll">
+      <p class="query-line">?- can_enroll(Student, Course).</p>
+      <div class="panel form-panel">
+        <h2>Enroll a Student in a Course</h2>
+        <div class="form-row">
+          <label for="enroll-student">Select Student</label>
+          <select id="enroll-student"></select>
+        </div>
+        <div class="form-row">
+          <label for="enroll-course">Select Course</label>
+          <select id="enroll-course"></select>
+        </div>
+        <button class="btn btn-primary" id="btn-enroll">Enroll Student</button>
+      </div>
+    </section>
+
+    <section class="view" id="view-student-courses">
+      <p class="query-line">?- student_courses(Student, Course).</p>
+      <div class="panel form-panel">
+        <h2>View Courses Taken by a Student</h2>
+        <div class="form-row">
+          <label for="sc-student">Select Student</label>
+          <select id="sc-student"></select>
+        </div>
+        <button class="btn btn-primary" id="btn-student-courses">View Courses</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="table-student-courses">
+          <thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty-note" id="note-student-courses" hidden>No courses to show yet.</p>
+      </div>
+    </section>
+
+    <section class="view" id="view-course-students">
+      <p class="query-line">?- course_students(Course, Student).</p>
+      <div class="panel form-panel">
+        <h2>View Students Enrolled in a Course</h2>
+        <div class="form-row">
+          <label for="cs-course">Select Course</label>
+          <select id="cs-course"></select>
+        </div>
+        <button class="btn btn-primary" id="btn-course-students">View Students</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="table-course-students">
+          <thead><tr><th>Student ID</th><th>Name</th><th>Department</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty-note" id="note-course-students" hidden>No students to show yet.</p>
+      </div>
+    </section>
+
+    <section class="view" id="view-check-enrollment">
+      <p class="query-line">?- is_enrolled(Student, Course).</p>
+      <div class="panel form-panel">
+        <h2>Check Whether a Student Is Enrolled</h2>
+        <div class="form-row">
+          <label for="ce-student">Student</label>
+          <select id="ce-student"></select>
+        </div>
+        <div class="form-row">
+          <label for="ce-course">Course</label>
+          <select id="ce-course"></select>
+        </div>
+        <button class="btn btn-primary" id="btn-check-enrollment">Check Enrollment</button>
+      </div>
+      <div class="panel" id="check-result-panel" hidden>
+        <p class="result-line" id="check-result-text"></p>
+      </div>
+    </section>
+
+    <section class="view" id="view-common-courses">
+      <p class="query-line">?- common_course(Student1, Student2, Course).</p>
+      <div class="panel form-panel">
+        <h2>Find Common Courses Between Two Students</h2>
+        <div class="form-row">
+          <label for="cc-student1">Student 1</label>
+          <select id="cc-student1"></select>
+        </div>
+        <div class="form-row">
+          <label for="cc-student2">Student 2</label>
+          <select id="cc-student2"></select>
+        </div>
+        <button class="btn btn-primary" id="btn-common-courses">Find Common Courses</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="table-common-courses">
+          <thead><tr><th>Course ID</th><th>Course Name</th><th>Credits</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty-note" id="note-common-courses" hidden>No common courses to show yet.</p>
+      </div>
+    </section>
+
+    <section class="view" id="view-departments">
+      <p class="query-line">?- students_in_department(Department, Student).</p>
+      <div class="panel form-panel">
+        <h2>Browse by Department</h2>
+        <div class="form-row">
+          <label for="dept-select">Department</label>
+          <select id="dept-select"></select>
+        </div>
+        <button class="btn btn-primary" id="btn-departments">View Department</button>
+      </div>
+      <div class="panel-grid">
+        <div class="panel">
+          <h2>Students</h2>
+          <table class="data-table" id="table-dept-students">
+            <thead><tr><th>ID</th><th>Name</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Courses</h2>
+          <table class="data-table" id="table-dept-courses">
+            <thead><tr><th>ID</th><th>Name</th><th>Credits</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
